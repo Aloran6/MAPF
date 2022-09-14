@@ -65,7 +65,7 @@ def disjoint_splitting(collision):
         constraints.append({'positive':False,'agent':collision['a2'], 'loc':collision['loc'], 'time_step':collision['time_step']})
         constraints.append({'positive':False,'agent':collision['a1'], 'loc':collision['loc'][::-1], 'time_step':collision['time_step']})
 
-        # This is supposed to be what the hint tells us to do, fails for some test cases
+
         # if agent == 'a1': 
         #     constraints.append({'positive':True,'agent':collision[agent],'loc':collision['loc'][::-1],'time_step':collision['time_step']})
         #     constraints.append({'positive':False,'agent':collision[agent],'loc':collision['loc'][::-1],'time_step':collision['time_step']})
@@ -157,22 +157,7 @@ class CBSSolver(object):
         root['collisions'] = detect_collisions(root['paths'])
         self.push_node(root)
 
-        # Task 3.1: Testing
-        #print(root['collisions'])
-
-        # Task 3.2: Testing
-        #for collision in root['collisions']:
-            #print(standard_splitting(collision))
-
-        ##############################
-        # Task 3.3: High-Level Search
-        #           Repeat the following as long as the open list is not empty:
-        #             1. Get the next node from the open list (you can use self.pop_node()
-        #             2. If this node has no collision, return solution
-        #             3. Otherwise, choose the first collision and convert to a list of constraints (using your
-        #                standard_splitting function). Add a new child node to your open list for each constraint
-        #           Ensure to create a copy of any objects that your child nodes might inherit
-        
+      
         while len(self.open_list)>0:
             next_node = self.pop_node()
             if len(next_node['collisions']) == 0:
