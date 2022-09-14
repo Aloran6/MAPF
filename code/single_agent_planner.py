@@ -48,12 +48,7 @@ def compute_heuristics(my_map, goal):
 
 
 def build_constraint_table(constraints, agent):
-    ##############################
-    # Task 1.2/1.3: Return a table that contains the list of constraints of
-    #               the given agent for each time step. The table can be used
-    #               for a more efficient constraint violation check in the 
-    #               is_constrained function.
-
+ 
     table = {}
     positive_table = {}
     locked = []
@@ -97,12 +92,7 @@ def get_path(goal_node):
 
 
 def is_constrained(curr_loc, next_loc, next_time, constraint_table):
-    ##############################
-    # Task 1.2/1.3: Check if a move from curr_loc to next_loc at time step next_time violates
-    #               any given constraint. For efficiency the constraints are indexed in a constraint_table
-    #               by time step, see build_constraint_table.
-
-    #True = BAD (constrained), False = GOOD (not constrained)
+  
     if next_time in constraint_table:
         for i in constraint_table[next_time]:
             if i == [next_loc] or i == [curr_loc, next_loc]:
@@ -144,9 +134,6 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
         constraints - constraints defining where robot should or cannot go at each time_step
     """
 
-    ##############################
-    # Task 1.1: Extend the A* search to search in the space-time domain
-    #           rather than space domain, only.
     table, locked, pos_table = build_constraint_table(constraints,agent)
     #table - negative constraints, pos_table - positive constraints, locked - "locked" location of previou agents' goal locations (used for prioritized method)
     open_list = []
@@ -171,9 +158,7 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
         curr = pop_node(open_list)
         if curr['time_step'] > upperLimit: #took too long
             break
-        #############################
-        # Task 1.4: Adjust the goal test condition to handle goal constraints
-        #manually add time_step > 10 to force the agents to take more than 10 steps, otherwise it would finish too fast
+       
         if curr['loc'] == goal_loc and curr['time_step'] >= earliest_goal_time_step: #curr['time_step'] >= 10
             return get_path(curr)
 
