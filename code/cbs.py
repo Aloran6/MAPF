@@ -5,7 +5,10 @@ from single_agent_planner import compute_heuristics, a_star, get_location, get_s
 
 
 def detect_collision(path1, path2):
-    
+    """
+    Detects collision of 2 agents
+    """
+
     for i in range(max(len(path1),len(path2))):
             path1_loc = get_location(path1,i)
             path2_loc = get_location(path2,i)
@@ -15,19 +18,19 @@ def detect_collision(path1, path2):
             if i > 0:
                 path1_prev_loc = get_location(path1, i-1)
                 path2_prev_loc = get_location(path2, i-1)
-                
+
                 if path1_loc == path2_prev_loc and path1_prev_loc == path2_loc:
                     return {'loc':[path1_loc,path2_loc],'time_step':i}
     return False
 
 
 def detect_collisions(paths):
-   
+
     collisions = []
     for i in range(0,len(paths)-1):
         for j in range(0,len(paths)):
             if i != j:
-            
+
                 collide = detect_collision(paths[i], paths[j])
                 if collide:
                     collisions.append({'a1':i, 'a2':j, 'loc': collide['loc'], 'time_step': collide['time_step']})
@@ -37,7 +40,7 @@ def detect_collisions(paths):
 
 
 def standard_splitting(collision):
-    
+
     constraints = []
 
     if len(collision['loc']) == 1: #this is a vertex constraint
@@ -51,22 +54,22 @@ def standard_splitting(collision):
 
 
 def disjoint_splitting(collision):
-    
+
     constraints = []
     agentChoice = ['a1','a2']
     agent = random.choice(agentChoice)
-   
+
 
     if len(collision['loc']) == 1: #vertex constraint
         constraints.append({'positive':True,'agent':collision[agent], 'loc':collision['loc'], 'time_step':collision['time_step']})
         constraints.append({'positive':False,'agent':collision[agent], 'loc':collision['loc'], 'time_step':collision['time_step']})
-    
+
     else: #edge constraint (taken directly from standard splitting)
         constraints.append({'positive':False,'agent':collision['a2'], 'loc':collision['loc'], 'time_step':collision['time_step']})
         constraints.append({'positive':False,'agent':collision['a1'], 'loc':collision['loc'][::-1], 'time_step':collision['time_step']})
 
 
-        # if agent == 'a1': 
+        # if agent == 'a1':
         #     constraints.append({'positive':True,'agent':collision[agent],'loc':collision['loc'][::-1],'time_step':collision['time_step']})
         #     constraints.append({'positive':False,'agent':collision[agent],'loc':collision['loc'][::-1],'time_step':collision['time_step']})
         # else:
@@ -157,7 +160,7 @@ class CBSSolver(object):
         root['collisions'] = detect_collisions(root['paths'])
         self.push_node(root)
 
-      
+
         while len(self.open_list)>0:
             next_node = self.pop_node()
             if len(next_node['collisions']) == 0:
@@ -167,13 +170,13 @@ class CBSSolver(object):
                 constraints = disjoint_splitting(next_node['collisions'][0])
             else:
                 constraints = standard_splitting(next_node['collisions'][0])
-            
+
             for constraint in constraints:
                 #print(constraint)
                 child = {'cost': 0,
                         'constraints': [],
                         'paths': [],
-                        'collisions': []}            
+                        'collisions': []}
                 child['constraints'] = next_node['constraints'].copy()
                 child['constraints'].append(constraint)
                 child['paths'] = next_node['paths'].copy()
@@ -181,7 +184,7 @@ class CBSSolver(object):
                 path = a_star(self.my_map, self.starts[agent], self.goals[agent], self.heuristics[agent], agent, child['constraints'])
                 if path:
                     valid_flag = True
-                    child['paths'][agent] = path    
+                    child['paths'][agent] = path
                     if disjoint: #disjoint splitting
                         if constraint['positive'] == True:
                             violating_agents = paths_violate_constraint(constraint, child['paths'])
@@ -199,19 +202,19 @@ class CBSSolver(object):
                                 else:
                                     valid_flag = False
                                     break
-                                    
-                   
+
+
                     if valid_flag:
                         child['collisions'] = detect_collisions(child['paths'])
                         child['cost'] = get_sum_of_cost(child['paths'])
                         self.push_node(child)
 
-                    
-                    
-                    #return root['paths']           
+
+
+                    #return root['paths']
 
         raise BaseException("No Solution")
-        
+
 
 
     def print_results(self, node):
